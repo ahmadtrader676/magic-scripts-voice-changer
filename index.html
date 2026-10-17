@@ -114,8 +114,7 @@
       outputCard.style.display = "none";
 
       try {
-        const base64Audio = await fileToBase64(file);
-        const response = await fetch('/api', {
+        const response = await fetch('/api', { // Yeh lazmi '/api' hona chahiye
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ audioBase64: base64Audio, voiceId: voiceId })
