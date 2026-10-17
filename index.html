@@ -104,8 +104,8 @@
       }
 
       const file = fileInput.files[0];
-      if (file.size > 3 * 1024 * 1024) {
-        showModal("❌ File size bohat bara hai! Baraye meherbani 3MB se choti audio file upload karein.");
+      if (file.size > 2 * 1024 * 1024) {
+        showModal("❌ File size bohat bara hai! 2MB se choti audio upload karein.");
         return;
       }
 
@@ -114,23 +114,26 @@
       outputCard.style.display = "none";
 
       try {
-        const response = await fetch('/api', { // Yeh lazmi '/api' hona chahiye
+        const base64Audio = await fileToBase64(file);
+        const response = await fetch('/api', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ audioBase64: base64Audio, voiceId: voiceId })
         });
+
         const data = await response.json();
 
-        if (data.success && data.audioUrl) {
+        if (response.ok && data.success && data.audioUrl) {
           audioPlayer.src = data.audioUrl;
           downloadBtn.href = data.audioUrl;
           outputCard.style.display = "block";
           showModal("✅ Voice kamyabi se change ho gayi hai!");
         } else {
-          showModal("❌ Fail Error: " + (data.error || "Voice convert nahi ho saki."));
+          showModal("❌ Server Response Error: " + (data.error || "Unknown error"));
         }
       } catch (err) {
-        showModal("❌ Server Error: Processing mein masla aaya.");
+        // Ab yahan asal technical error show hoga
+        showModal("❌ Catch Error: " + err.message);
       } finally {
         btn.disabled = false;
         btn.innerText = "Convert Voice 🚀";
